@@ -89,3 +89,25 @@ CREATE TABLE `university_db`.`course` (
 ALTER TABLE `university_db`.`department` 
 ADD COLUMN `number_of_instructors` INT NULL AFTER `number_of_students`,
 ADD COLUMN `number_of_courses` INT NULL AFTER `number_of_instructors`;
+
+ALTER TABLE `university_db`.`department` 
+ADD COLUMN `flag` INT NULL AFTER `number_of_courses`;
+
+ALTER TABLE `university_db`.`department` 
+CHANGE COLUMN `flag` `flag` INT(11) NULL DEFAULT 1 ;
+
+ALTER TABLE `university_db`.`instructor` 
+CHANGE COLUMN `type` `instructor_type` VARCHAR(50) NULL DEFAULT NULL ;
+
+ALTER TABLE `university_db`.`instructor` 
+ADD COLUMN `flag` INT NULL AFTER `d_ID`;
+
+ALTER TABLE `university_db`.`instructor` 
+CHANGE COLUMN `flag` `flag` INT(11) NULL DEFAULT 1 ;
+
+ALTER TABLE `university_db`.`student` 
+ADD COLUMN `flag` INT NULL DEFAULT 1 AFTER `d_ID`;
+
+ALTER TABLE `university_db`.`course` 
+ADD COLUMN `flag` INT NULL DEFAULT 1 AFTER `academic_year`;
+

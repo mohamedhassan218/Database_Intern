@@ -10,7 +10,7 @@ BEGIN
 	IF duplicates > 0 THEN 
 		SET p_error_msg = 'This department is already existed.';
 	ELSE
-		INSERT INTO department (department_name, number_of_students, number_of_instructors, number_of_courses)
-        VALUES (p_department_name, p_no_of_students, p_no_of_instructors, p_no_of_courses);
+		INSERT INTO department (department_name)
+        VALUES (p_department_name);
     END IF;
 END
