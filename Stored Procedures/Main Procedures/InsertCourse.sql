@@ -39,5 +39,9 @@ BEGIN
 		INSERT INTO course (course_name, lectures_number, minimum_lectures, d_ID, i_ID, academic_year)
         VALUES (p_c_name, p_c_lectures_number, p_minimum_lectures, p_d_ID, p_i_ID, p_academic_year);
         SET msg = 'Course is inserted successfully.';
+        
+        UPDATE department
+        SET number_of_courses = number_of_courses + 1
+        WHERE department_ID = p_d_ID;
 	END IF;
 END

@@ -111,3 +111,6 @@ ADD COLUMN `flag` INT NULL DEFAULT 1 AFTER `d_ID`;
 ALTER TABLE `university_db`.`course` 
 ADD COLUMN `flag` INT NULL DEFAULT 1 AFTER `academic_year`;
 
+ALTER TABLE `university_db`.`student_course` 
+ADD COLUMN `flag` INT NULL DEFAULT 1 AFTER `attended_lectures`;
+

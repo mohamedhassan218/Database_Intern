@@ -1,0 +1,17 @@
+• Get all courses of specific department
+• Get instructors data of first academic year (using join and sub queries)
+• Calculate number of students in each department
+• Get students data that is in specific department and specific academic year
+• Get non graduate students
+• Get students that their names start with ‘A’
+• Get courses of specific academic year
+• Get exams in current month
+• Get students data prevented from final exam in specific course
+• Get total degrees of each student in quizzes and midterm in specific course
+• Get students score and his GPA in each course
+• Get student score in details (quizzes score, midterm sore and final score)
+• Get student name and names of courses that he not passed
+• Report on success ratio of each course contains number of students, number of
+  succeed students, failed students and success ratio
+• Get top 10 students in each academic year.
+• Get top 10 students in midterm exam of specific course.
