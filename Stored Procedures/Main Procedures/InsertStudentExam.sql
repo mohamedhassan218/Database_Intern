@@ -1,21 +1,30 @@
 CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertStudentExam`(
-	IN STUDENT_ID INT,
-    IN EXAM_ID INT
+	in p_s_ID int,
+    in p_e_ID int,
+    in p_degree int,
+    out msg varchar(300)
 )
 BEGIN
-	DECLARE S_ID INT;
-    DECLARE E_ID INT;
+	declare student_exist int;
+    declare exam_exist int;
     
-    SELECT COUNT(*) INTO S_ID
-    FROM student
-    WHERE student_ID = STUDENT_ID AND flag = 1;
+    select count(*) into student_exist 
+    from student 
+    where student_ID = p_s_ID;
     
-    SELECT COUNT(*) INTO E_ID
-    FROM exam
-    WHERE exam_ID = EXAM_ID AND flag = 1;
+    select count(*) into exam_exist 
+    from exam 
+    where exam_ID = p_e_ID;
     
-    IF S_ID > 0 AND E_ID > 0 THEN 
-		INSERT INTO student_exam(s_ID, e_ID)
-        VALUES(STUDENT_ID, EXAM_ID);
-    END IF;
+    if student_exist > 0 and exam_exist > 0 then
+		insert into student_exam(s_ID, e_ID, degree)
+        values(p_s_ID, p_e_ID, p_degree);
+        set msg = 'Succedded.';
+	else
+		if student_exist = 0 then
+			set msg = 'Student id is not exist.';
+		else
+			set msg = 'Exam id is not exist.';
+		end if;
+	end if;
 END

@@ -44,8 +44,6 @@ BEGIN
 		update student
         set student_name = s_name, mobile_number = s_mobile, profile_photo = s_photo, student_email = s_email, date_of_birth = s_dob, age = s_age, gender = s_gender, d_ID = s_dID
         where student_ID = s_ID;
-        
         set msg = 'Student updated successfully.';
-        
 	end if;
 END

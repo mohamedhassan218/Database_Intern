@@ -3,7 +3,6 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertExam`(
     IN e_date DATE,
     IN e_s_time TIME,
     IN e_e_time TIME,
-    IN e_duration INT,
     IN e_number_of_questions INT,
     IN e_degree INT,
     IN exam_type VARCHAR(10),
@@ -13,7 +12,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertExam`(
 BEGIN
     DECLARE C_ID INT DEFAULT 0;
     DECLARE FLAG INT DEFAULT 1;
-    
+    declare e_duration int;
+    set e_duration = TIMEDIFF(e_e_time, e_s_time);
     -- Check if the course exists and is active
     SELECT COUNT(*) INTO C_ID
     FROM course
