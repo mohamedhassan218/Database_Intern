@@ -7,7 +7,7 @@ BEGIN
     
     select count(*) into usr_exist 
     from user_data
-    where user_ID = p_usr_ID;
+    where user_ID = p_usr_ID and flag = 1;
 	
     if usr_exist = 0 then
 		set msg = 'User Id is not found.';

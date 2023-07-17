@@ -4,13 +4,17 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertDepartment`(
 )
 BEGIN
 	DECLARE duplicates INT;
-    SELECT COUNT(*) INTO duplicates FROM department
-    WHERE p_department_name = department_name;
+    if p_department_name is null then
+		set p_error_msg = 'Department name can not be null.';
+	else 
+		SELECT COUNT(*) INTO duplicates FROM department
+		WHERE p_department_name = department_name;
 
-	IF duplicates > 0 THEN 
-		SET p_error_msg = 'This department is already existed.';
-	ELSE
-		INSERT INTO department (department_name)
-        VALUES (p_department_name);
-    END IF;
+		IF duplicates > 0 THEN 
+			SET p_error_msg = 'This department is already existed.';
+		ELSE
+			INSERT INTO department (department_name)
+			VALUES (p_department_name);
+		END IF;
+	end if;
 END

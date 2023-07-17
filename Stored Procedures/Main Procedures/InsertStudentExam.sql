@@ -8,23 +8,31 @@ BEGIN
 	declare student_exist int;
     declare exam_exist int;
     
-    select count(*) into student_exist 
-    from student 
-    where student_ID = p_s_ID;
-    
-    select count(*) into exam_exist 
-    from exam 
-    where exam_ID = p_e_ID;
-    
-    if student_exist > 0 and exam_exist > 0 then
-		insert into student_exam(s_ID, e_ID, degree)
-        values(p_s_ID, p_e_ID, p_degree);
-        set msg = 'Succedded.';
+    if p_s_ID is null then 
+		set msg = 'Student Id must be specified.';
+	elseif p_e_ID is null then 
+		set msg = 'Exam Id must be specified.';
+	elseif p_degree is null then
+		set msg = 'Degree must be filled.';
 	else
-		if student_exist = 0 then
-			set msg = 'Student id is not exist.';
+		select count(*) into student_exist 
+		from student 
+		where student_ID = p_s_ID;
+    
+		select count(*) into exam_exist 
+		from exam 
+		where exam_ID = p_e_ID;
+    
+		if student_exist > 0 and exam_exist > 0 then
+			insert into student_exam(s_ID, e_ID, degree)
+			values(p_s_ID, p_e_ID, p_degree);
+			set msg = 'Succedded.';
 		else
-			set msg = 'Exam id is not exist.';
+			if student_exist = 0 then
+				set msg = 'Student id is not exist.';
+			else
+				set msg = 'Exam id is not exist.';
+			end if;
 		end if;
-	end if;
+    end if;
 END
