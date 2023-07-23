@@ -3,34 +3,20 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteYear`(
     out msg varchar(300)
 )
 BEGIN
-	declare year_exist int;
-    declare stu_year_exist int;
-    declare course_year_exist int;
-    
-    select count(*) into year_exist
-    from academic_year
-    where year_ID = p_y_ID and flag = 1;
-    
-    if year_exist > 0 then
-		select count(*) into stu_year_exist
-        from student_year
-        where y_ID = p_y_ID;
-    
-		select count(*) into course_year_exist
-        from course
-        where y_ID = p_y_ID and flag = 1;
-        
-        if stu_year_exist > 0 then
-			set msg = 'Year can not be deleted due to students in it.';
-		elseif course_year_exist > 0 then
-			set msg = 'Year can not be deleted due to course in it.';
+    if exists (select 1 from academic_year where year_ID = p_y_ID and flag = 1) then
+		if not exists (select 1 from student_year where y_ID = p_y_ID and flag = 1) then
+			if not exists(select 1 from course where y_ID = p_y_ID and flag = 1) then
+				update academic_year
+				set flag = 0
+				where year_ID = p_y_ID;
+				set msg = 'Year is deleted successfully.';
+			else
+				set msg = 'Year can not be deleted due to course in it.';
+			end if;
 		else
-			update academic_year
-			set flag = 0
-			where year_ID = p_y_ID;
-			set msg = 'Year is deleted successfully.';
+			set msg = 'Year can not be deleted due to students in it.';
 		end if;
-    else
-		set msg = 'Year is not existed';
+	else
+		set msg = 'Year can not be found.';
 	end if;
 END

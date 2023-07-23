@@ -9,12 +9,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertStudent`(
     out msg varchar(300)
 )
 BEGIN
+	declare s_age int;
 	DECLARE name_pattern VARCHAR(300);
     DECLARE email_pattern VARCHAR(200);
     DECLARE phone_pattern VARCHAR(40);
-    declare s_age int;
-    DECLARE department_counter INT;
-    DECLARE email_counter INT;
     SET name_pattern = '^[a-z A-Z\\s]+$';
     SET email_pattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
     SET phone_pattern = '^\\+20[0-9]{10}$'; 
@@ -28,17 +26,9 @@ BEGIN
     else
         set s_age = DATEDIFF(CURRENT_DATE, s_dob) / 365;
 		
-        select count(*) into email_counter
-		from student
-		where student_email = s_email and flag = 1;
-    
-		select count(*) into department_counter
-		from department
-		where department_ID = s_dID and flag = 1;
-    
-		if email_counter > 0 then
+        if exists (select 1 from student where student_email = s_email and flag = 1) then
 			set msg = 'You must enter unique email.';
-		elseif department_counter = 0 then
+		elseif not exists (select 1 from department where department_ID = s_dID and flag = 1) then
 			set msg = 'Department ID is not found.';
 		elseif s_name regexp name_pattern = 0 then
 			set msg = 'Please enter a valid name.';

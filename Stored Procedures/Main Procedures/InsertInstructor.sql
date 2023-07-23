@@ -13,8 +13,6 @@ BEGIN
     DECLARE name_pattern VARCHAR(300);
     DECLARE email_pattern VARCHAR(200);
     DECLARE phone_pattern VARCHAR(40);
-    DECLARE department_counter INT;
-    DECLARE email_counter INT;
 
     SET name_pattern = '^[a-z A-Z\\s]+$';
     SET email_pattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
@@ -37,16 +35,10 @@ BEGIN
 	elseif p_i_dID is null then
 		set msg = 'Department Id can not be null.';
 	else
-		SELECT COUNT(*) INTO department_counter FROM department
-		WHERE department_ID = p_i_dID;
-
-		SELECT COUNT(*) INTO email_counter FROM instructor
-		WHERE instructor_email = p_i_email;
-
-		IF department_counter = 0 THEN
-			SET msg = 'Department is not found.';
-		ELSEIF email_counter > 0 THEN
-			SET msg = 'Your email must be unique.';
+        if not exists (select 1 from department where department_ID = p_i_dID) then
+			set msg = 'Department is not found.';
+        elseif exists (select 1 from instructor where instructor_email = p_i_email) then
+			set msg = 'Email must be unique.';
 		ELSEIF p_i_name REGEXP name_pattern = 0 THEN
 			SET msg = 'Invalid name.';
 		ELSEIF p_i_phone REGEXP phone_pattern = 0 THEN

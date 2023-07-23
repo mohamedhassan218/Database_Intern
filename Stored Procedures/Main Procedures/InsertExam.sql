@@ -10,9 +10,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertExam`(
     OUT msg VARCHAR(300)
 )
 BEGIN
-    DECLARE C_ID INT DEFAULT 0;
-    DECLARE FLAG INT DEFAULT 1;
+    DECLARE FLAG INT;
     declare e_duration int;
+    
+    
+    set FLAG = 1;
 	if e_name is null then
 		set msg = 'Exam name can not be null.';
 	elseif e_date is null then
@@ -32,15 +34,11 @@ BEGIN
 	else
 		SET e_duration = TIME_TO_SEC(TIMEDIFF(e_e_time, e_s_time)) / 3600;
 		-- Check if the course exists and is active
-		SELECT COUNT(*) INTO C_ID
-		FROM course
-		WHERE course_ID = e_c_ID AND flag = 1;
+        if not exists (select 1 from course where course_ID = e_c_ID and flag = 1) then
+			set msg = 'Course is not found.';
+            set FLAG = 0;
+        end if;
         
-		IF C_ID <= 0 THEN
-			SET msg = 'The course is not found.';
-			SET FLAG = 0;
-		END IF;
-
 		IF e_e_time <= e_s_time THEN
 			SET msg = 'Please enter valid start and end times.';
 			SET FLAG = 0;

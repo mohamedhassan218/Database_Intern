@@ -3,14 +3,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteUser`(
     out msg varchar(400)
 )
 BEGIN
-	declare usr_exist int;
-    
-    select count(*) into usr_exist 
-    from user_data
-    where user_ID = p_usr_ID and flag = 1;
-	
-    if usr_exist = 0 then
-		set msg = 'User Id is not found.';
+    if not exists (select 1 from user_data where user_ID = p_usr_ID and flag = 1) then
+		set msg = 'User is not found.';
 	else
 		update user_data
         set flag = 0

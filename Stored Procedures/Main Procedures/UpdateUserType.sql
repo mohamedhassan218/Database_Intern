@@ -4,27 +4,16 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateUserType`(
     out msg varchar(300)
 )
 BEGIN
-	declare usr_exist int;
-    declare type_exist int;
-    
-	SELECT COUNT(*) INTO usr_exist
-	FROM user_data
-	WHERE user_ID = p_usr_ID AND flag = 1;
-
-	IF usr_exist = 0 THEN
-		SET msg = 'User ID is not found.';
-	ELSE
-		select count(*) into type_exist
-        from user_type
-        where user_type_ID = p_usr_ID;
-		
-        if type_exist = 0 then
-			set msg = 'Type id is not found.';
-		else
+    if exists (select 1 from user_data where user_ID = p_usr_ID and flag = 1) then
+		set msg = 'User ID is not found.';
+	else
+        if exists (select 1 from user_type where user_type_ID = p_usr_ID) then
 			update user_data
             set user_type = p_usr_new_type
             where user_ID = p_usr_ID;
             set msg = 'User type updated successfully.';
+		else
+			set msg = 'Type id is not found.';
         end if;
-	END IF;
+	end if;
 END

@@ -1,5 +1,6 @@
 CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteDepartmentID`(
 	IN p_d_ID INT,
+    in author_ID int,
     out msg varchar(400)
 )
 BEGIN
@@ -19,16 +20,20 @@ BEGIN
     from course
     where d_ID = p_d_ID and flag = 1;
     
-	if courses_cntr > 0 then
-		set msg = 'Department can not be deleted due to courses in it.';
-	elseif students_cntr > 0 then
-		set msg = 'Department can not be deleted due to students in it.';
-	elseif instructors_cntr > 0 then
-		set msg = 'Department can not be deleted due to instructors in it.';
+    if author_ID = 1 then
+		if courses_cntr > 0 then
+			set msg = 'Department can not be deleted due to courses in it.';
+		elseif students_cntr > 0 then
+			set msg = 'Department can not be deleted due to students in it.';
+		elseif instructors_cntr > 0 then
+			set msg = 'Department can not be deleted due to instructors in it.';
+		else
+			UPDATE department 
+			SET flag = 0
+			WHERE department_ID = p_d_ID;
+			set msg = 'Department is deleted successfully.';
+		end if;
 	else
-		UPDATE department 
-		SET flag = 0
-		WHERE department_ID = p_d_ID;
-        set msg = 'Department is deleted successfully.';
+		set msg = 'Only admin can delete department.';
 	end if;
 END

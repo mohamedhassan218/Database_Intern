@@ -3,13 +3,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteInstructorID`(
     out msg varchar(300)
 )
 BEGIN
-    declare ins_exist int;
-    
-    select count(*) into ins_exist
-    from course
-    where i_ID = p_i_ID and flag = 1;
-    
-    if ins_exist > 0 then
+    if not exists (select 1 from course where i_ID = p_i_ID and flag = 1) then
 		update department join instructor on department_ID = d_ID
 		set number_of_instructors = number_of_instructors - 1
 		where instructor_ID = p_i_ID and instructor.flag = 1;
@@ -17,8 +11,8 @@ BEGIN
 		UPDATE instructor
 		SET flag = 0
 		WHERE instructor_ID = p_i_ID;
-    
-		if row_count() > 0 then
+        
+        if row_count() > 0 then
 			set msg = 'Instructor is deleted successfully.';
 		else
 			set msg = 'Instructor ID is not found.';

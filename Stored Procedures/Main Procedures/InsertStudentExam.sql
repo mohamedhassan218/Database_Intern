@@ -5,9 +5,6 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertStudentExam`(
     out msg varchar(300)
 )
 BEGIN
-	declare student_exist int;
-    declare exam_exist int;
-    
     if p_s_ID is null then 
 		set msg = 'Student Id must be specified.';
 	elseif p_e_ID is null then 
@@ -15,24 +12,16 @@ BEGIN
 	elseif p_degree is null then
 		set msg = 'Degree must be filled.';
 	else
-		select count(*) into student_exist 
-		from student 
-		where student_ID = p_s_ID;
-    
-		select count(*) into exam_exist 
-		from exam 
-		where exam_ID = p_e_ID;
-    
-		if student_exist > 0 and exam_exist > 0 then
-			insert into student_exam(s_ID, e_ID, degree)
-			values(p_s_ID, p_e_ID, p_degree);
-			set msg = 'Succedded.';
-		else
-			if student_exist = 0 then
-				set msg = 'Student id is not exist.';
+        if exists (select 1 from student where student_ID = p_s_ID) then
+			if exists (select 1 from exam where exam_ID = p_e_ID) then
+				insert into student_exam(s_ID, e_ID, degree)
+				values(p_s_ID, p_e_ID, p_degree);
+				set msg = 'Succedded.';
 			else
-				set msg = 'Exam id is not exist.';
+				set msg = 'Exam is not found.';
 			end if;
+		else
+			set msg = 'Student is not found.';
 		end if;
     end if;
 END

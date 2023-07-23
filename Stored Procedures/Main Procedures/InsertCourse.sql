@@ -5,13 +5,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertCourse`(
     IN p_d_ID INT,
     IN p_i_ID INT,
     IN p_academic_year INT,
+    in p_course_degree INT,
     OUT msg VARCHAR(200)
 )
 BEGIN
-	DECLARE duplicates INT;
-    DECLARE D_ID INT;
-    DECLARE I_ID INT;
-    DECLARE A_ID INT;
     if p_c_name is null then
 		set msg = 'Name can not be null.';
 	elseif p_c_lectures_number is null then
@@ -24,32 +21,24 @@ BEGIN
 		set msg = 'Instructor ID can not be null.';
 	elseif p_academic_year is null then
 		set msg = 'You must specify the academic year of the course.';
+	elseif p_course_degree is null then
+		set msg = 'Course degree can not be null.';
+	elseif p_course_degree < 0 then
+		set msg = 'Course Degree must be greater than zero.';
 	else
-		SELECT COUNT(*) INTO duplicates FROM course
-		WHERE p_c_name = course_name;
-    
-		SELECT COUNT(*) INTO D_ID FROM department
-		WHERE department_ID = p_d_ID;
-    
-		SELECT COUNT(*) INTO I_ID FROM instructor
-		WHERE instructor_ID = p_i_ID;
-    
-		SELECT COUNT(*) INTO A_ID FROM academic_year
-		WHERE year_ID = p_academic_year;
-    
-		IF duplicates > 0 THEN
+        if exists (select 1 from course where p_c_name = course_name) then
 			SET msg = 'Course is already exist.';
+        elseif not exists (select 1 from department where department_ID = p_d_ID) then
+			SET msg = 'Department is not found.';
+		elseif not exists (select 1 from instructor where instructor_ID = p_i_ID) then
+			SET msg = 'Instructor is not found.';
+		elseif not exists (select 1 from academic_year where year_ID = p_academic_year) then
+			SET msg = 'Academic year is not found.';
 		ELSEIF p_c_lectures_number < p_minimum_lectures OR p_minimum_lectures < 0 OR p_c_lectures_number < 0 THEN
 			SET msg = 'Please enter the number of lectures and minimum number of lectures correctly.';
-		ELSEIF D_ID = 0 THEN
-			SET msg = 'Department is not found.';
-		ELSEIF A_ID = 0 THEN
-			SET msg = 'Academic year is not found.';
-		ELSEIF I_ID = 0 THEN
-			SET msg = 'Instructor is not found.';
 		ELSE 
-			INSERT INTO course (course_name, lectures_number, minimum_lectures, d_ID, i_ID, academic_year)
-			VALUES (p_c_name, p_c_lectures_number, p_minimum_lectures, p_d_ID, p_i_ID, p_academic_year);
+			INSERT INTO course (course_name, lectures_number, minimum_lectures, d_ID, i_ID, academic_year, course_degree)
+			VALUES (p_c_name, p_c_lectures_number, p_minimum_lectures, p_d_ID, p_i_ID, p_academic_year, p_course_degree);
 			SET msg = 'Course is inserted successfully.';
 			UPDATE department
 			SET number_of_courses = number_of_courses + 1

@@ -3,13 +3,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteExam`(
     out msg varchar(300)
 )
 BEGIN
-	declare ifAvaliable int;
-    
-    select count(*) into ifAvaliable
-    from student_exam
-    where e_ID = p_e_ID and flag = 0;
-    
-    if ifAvaliable > 0 then 
+    if exists (select 1 from student_exam where e_ID = p_e_ID and flag = 1) then
 		set msg = 'This exam can not be deleted.';
 	else
 		UPDATE exam
