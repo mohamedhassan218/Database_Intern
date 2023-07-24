@@ -16,6 +16,9 @@ BEGIN
 			if exists (select 1 from exam where exam_ID = p_e_ID) then
 				insert into student_exam(s_ID, e_ID, degree)
 				values(p_s_ID, p_e_ID, p_degree);
+                update student
+                set student.total_degree = student.total_degree + p_degree
+                where student.student_ID = p_s_ID;
 				set msg = 'Succedded.';
 			else
 				set msg = 'Exam is not found.';
