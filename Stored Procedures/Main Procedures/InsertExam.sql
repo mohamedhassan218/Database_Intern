@@ -7,12 +7,16 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `InsertExam`(
     IN e_degree INT,
     IN exam_type VARCHAR(10),
     IN e_c_ID INT,
+    in p_author_ID int,
     OUT msg VARCHAR(300)
 )
 BEGIN
     DECLARE FLAG INT;
     declare e_duration int;
-    
+    -- Permissions: only admins or instructor that teach the course can insert new exam.
+    declare p_usr_type int;
+    declare p_ins_ID int;
+    declare p_c_I_ID int;
     
     set FLAG = 1;
 	if e_name is null then
@@ -55,9 +59,29 @@ BEGIN
 		END IF;
 
 		IF FLAG = 1 THEN
-			INSERT INTO exam (exam_name, exam_date, start_time, end_time, duration, number_of_questions, degree, exam_type, c_ID)
-			VALUES (e_name, e_date, e_s_time, e_e_time, e_duration, e_number_of_questions, e_degree, exam_type, e_c_ID);
-			SET msg = 'Exam inserted successfully.';
+			
+           -- Check the user type.
+			select user_type into p_usr_type 
+			from user_data
+			where user_ID = p_author_ID and flag = 1; 
+        
+			-- Get the instructor id of the course.
+			select i_ID into p_ins_ID
+			from user_data
+			where user_ID = p_author_ID and flag = 1;
+            
+            -- Ensure that course is tought with the same instructor.alter
+            select i_ID into p_c_I_ID
+            from course
+            where course_ID = e_c_ID and flag = 1;
+            
+			 if p_ins_ID = p_c_I_ID or p_usr_type = 1 then	
+				INSERT INTO exam (exam_name, exam_date, start_time, end_time, duration, number_of_questions, degree, exam_type, c_ID, author)
+				VALUES (e_name, e_date, e_s_time, e_e_time, e_duration, e_number_of_questions, e_degree, exam_type, e_c_ID, p_author_ID);
+				SET msg = 'Exam inserted successfully.';
+			else
+				set msg = 'You do not have the permission to update this course.';
+			end if;
 		END IF;
 	end if;
 END

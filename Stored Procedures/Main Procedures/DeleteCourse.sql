@@ -1,35 +1,40 @@
 CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteCourse`(
 	IN p_c_ID INT,
-    in author_id int,
-    out msg varchar(300)
+    IN p_author_ID INT,
+    OUT msg VARCHAR(300)
 )
 BEGIN
-	if exists (select c_ID from student_course where c_ID = p_c_ID and flag = 1) then
-		set msg = 'This course can not be deleted';
-	else
-		if not exists (select course_ID from course where course_ID = p_c_ID and author_id = author) then
-			if author_id = 1 then
-				update department left join course on department_ID = d_ID
-				set number_of_courses = number_of_courses - 1
-				where course_ID = p_c_ID and course.flag = 1;
-                
-				UPDATE course
-				SET flag = 0
-				WHERE course_ID = p_c_ID;
-                
-				set msg = 'Course is deleted successfully.';
-            else
-				set msg = 'You do not have the permission to delete the course.';
-			end if;
-		else
-			update department left join course on department_ID = d_ID
-			set number_of_courses = number_of_courses - 1
-			where course_ID = p_c_ID and course.flag = 1;
-            set msg = 'Course is deleted successfully.';
-			
+	-- Permissions: only admins and instructors who teach the course can delete it.
+    DECLARE p_usr_type INT;
+    DECLARE p_usr_ID INT;
+	
+    IF EXISTS (SELECT c_ID FROM student_course WHERE c_ID = p_c_ID AND flag = 1) THEN
+		SET msg = 'This course cannot be deleted because students are enrolled in it.';
+	ELSE
+		-- Check the user type.
+        SELECT user_type INTO p_usr_type 
+        FROM user_data
+        WHERE user_ID = p_author_ID AND flag = 1; 
+        
+        -- Get the instructor id of the course.
+        SELECT i_ID INTO p_usr_ID
+        FROM course
+        WHERE course_ID = p_c_ID AND flag = 1;
+        
+        IF p_usr_ID = p_author_ID OR p_usr_type = 1 THEN
+			-- Decrease the number_of_courses for the department that the course belongs to.
+			UPDATE department
+			SET number_of_courses = number_of_courses - 1
+			WHERE department_ID = (SELECT d_ID FROM course WHERE course_ID = p_c_ID AND flag = 1);
+            
+            -- Soft delete the course (set the flag to 0).
 			UPDATE course
 			SET flag = 0
 			WHERE course_ID = p_c_ID;
-		end if;
-	end if;
+			
+			SET msg = 'Course is deleted successfully.';
+		ELSE
+			SET msg = 'You do not have permission to delete this course.';
+		END IF;
+	END IF;
 END
