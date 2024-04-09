@@ -23,7 +23,7 @@ This project serves as a demonstration of building a relational database for a u
 
 The Entity-Relationship (ER) Diagram provides a visual representation of the database schema, illustrating the entities, attributes, and relationships involved.
 
-![ER Diagram](../Database_Intern/ERD/ERD.png)
+![ER Diagram](ERD/ERD.png)
 
 ## Features
 
